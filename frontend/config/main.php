@@ -9,6 +9,8 @@ $params = array_merge(
 return [
     'homeUrl' => '/',
     'id' => 'app-frontend',
+    'language' => 'ru',
+    'name' => 'Библиотека',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
@@ -45,7 +47,8 @@ return [
             'rules' => [
                 '' => 'site/index',
                 '<action:\w+>' => 'site/<action>',
-                'admin' => 'admin/site/index'
+                'admin' => 'admin/site/index',
+                'racks/<action>' => 'admin/racks/<action>'
             ],
         ],
     ],

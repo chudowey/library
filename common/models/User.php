@@ -6,6 +6,7 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use yii\db\Expression;
 
 /**
  * User model
@@ -23,8 +24,17 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
+    /**
+     * Статусы юзеров
+     */
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
+
+    /**
+     * Роли пользователей
+     */
+    const ROLE_READER = 1;
+    const ROLE_ADMIN = 10;
 
 
     /**
@@ -36,12 +46,15 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
+            'timestamp' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'value' => new Expression('NOW()'),
+            ],
         ];
     }
 
@@ -51,8 +64,8 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            ['role', 'default', 'value' => self::ROLE_READER],
-            ['role', 'in', 'range' => [self::ROLE_READER, self::ROLE_DELETED, self::ROLE_ADMIN]],
+            ['status', 'default', 'value' => self::STATUS_ACTIVE],
+            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
             [['email', 'auth_key', 'password_hash'], 'required'],
             [['birthday', 'created_at', 'updated_at'], 'safe'],
             [['name', 'username', 'surname', 'lastname', 'email', 'address', 'phone', 'password_hash', 'password_reset_token'], 'string', 'max' => 255],
@@ -83,6 +96,19 @@ class User extends ActiveRecord implements IdentityInterface
             'password_reset_token' => 'Password Reset Token',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата регистрации',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'timestamp' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'value' => new Expression('NOW()'),
+            ],
         ];
     }
 

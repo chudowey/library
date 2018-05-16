@@ -39,6 +39,7 @@ class m130524_201442_init extends Migration
         $this->createTable('{{%racks}}', [
             'id' => $this->primaryKey(),
             'name' => $this->string(),
+            'department_id' => $this->integer(),
         ], $tableOptions);
 
         $this->createTable('{{%books}}', [
@@ -47,9 +48,9 @@ class m130524_201442_init extends Migration
             'author' => $this->string()->notNull(),
             'genre' => $this->string(),
             'publishing' => $this->string(),
-            'public_date' => $this->string()->notNull(),
+            'public_date' => $this->string(),
             'pages' => $this->smallInteger(),
-            'departament_id' => $this->integer(),
+            'department_id' => $this->integer(),
             'rack_id' => $this->integer(),
             'count' => $this->smallInteger(),
             'created_at' => $this->timestamp()->notNull(),
@@ -66,6 +67,13 @@ class m130524_201442_init extends Migration
             'created_at' => $this->timestamp()->notNull(),
             'updated_at' => $this->timestamp()->notNull(),
         ], $tableOptions);
+
+        $this->addForeignKey('racks_department_id_fk', '{{%racks}}', 'department_id', '{{%departments}}', 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey('books_department_id_fk', '{{%books}}', 'department_id', '{{%departments}}', 'id', null, 'CASCADE');
+        $this->addForeignKey('books_racks_id_fk', '{{%books}}', 'rack_id', '{{%racks}}', 'id', null, 'CASCADE');
+        $this->addForeignKey('reader_card_book_id_fk', '{{%reader_card}}', 'book_id', '{{%books}}', 'id', null, 'CASCADE');
+        $this->addForeignKey('reader_card_reader_id_fk', '{{%reader_card}}', 'reader_id', '{{%user}}', 'id', null, 'CASCADE');
+        $this->addForeignKey('reader_card_employee_id_fk', '{{%reader_card}}', 'employee_id', '{{%user}}', 'id', null, 'CASCADE');
     }
 
     public function safeDown()
