@@ -42,6 +42,9 @@ use yii\widgets\ActiveForm;
             </div>
             <div class="row">
                 <?= $form->field($model, 'count', ['options' => ['class' => 'col-sm-4']])->textInput(['type' => 'number']) ?>
+                <?= $form->field($model, 'code')->textInput(['maxlength' => true]) ?>
+            </div>
+            <div class="row">
                 <?= $form->field($model, 'department_id', ['options' => ['class' => 'col-sm-4']])->dropDownList(\common\models\Departments::getToSelect(), [
                     'class' => 'form-control prompt',
                     'prompt' => 'Выберите отдел',
@@ -51,6 +54,9 @@ use yii\widgets\ActiveForm;
                         'disabled'  => !isset($model->department_id) ? true : false
                     ]);
                 ?>
+            </div>
+            <div class="row">
+                <?= $form->field($model, 'description', ['options' => ['class' => 'col-sm-8']])->textarea() ?>
             </div>
             <div class="row">
                 <div class="col-sm-4">
@@ -75,12 +81,11 @@ $this->registerJs('
            data: {departmentId: departmentId}
         }).done(function(response){
             if (response) {
-                $(rack).find("option").not(":eq(0)").remove();
+                $(rack).find("option").remove();
                 $(rack).prop({disabled: false, selectedIndex: 0});
                 $.each(response, function(id, label) {
                     $(rack).append("<option value=\"" + id + "\">" + label + "</option>");
                 });
-                $(rack).material_select();
             } else {
                 $(rack).find("option").not(":eq(0)").remove();
                 $(rack).prop({disabled: true, selectedIndex: 0});

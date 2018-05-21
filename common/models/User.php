@@ -7,6 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * User model
@@ -27,15 +28,30 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Статусы юзеров
      */
-    const STATUS_DELETED = 0;
+    const STATUS_BLOCKED = 0;
     const STATUS_ACTIVE = 10;
 
     /**
      * Роли пользователей
      */
     const ROLE_READER = 1;
+    const ROLE_EMPLOYEE = 2;
     const ROLE_ADMIN = 10;
 
+    private static $role_list = [
+        self::ROLE_READER => 'Читатель',
+        self::ROLE_EMPLOYEE => 'Библиотекарь',
+        self::ROLE_ADMIN => 'Администратор'
+    ];
+
+    /**
+     * Список статусов
+     * @var array
+     */
+    private $status = [
+        self::STATUS_ACTIVE => 'Активный',
+        self::STATUS_BLOCKED => 'Заблокированный',
+    ];
 
     /**
      * {@inheritdoc}
@@ -65,10 +81,10 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
-            [['email', 'auth_key', 'password_hash'], 'required'],
+            /*['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_BLOCKED]],*/
+            [['password_hash', 'username'], 'required'],
             [['birthday', 'created_at', 'updated_at'], 'safe'],
-            [['name', 'username', 'surname', 'lastname', 'email', 'address', 'phone', 'password_hash', 'password_reset_token'], 'string', 'max' => 255],
+            [['name', 'username', 'surname', 'lastname', 'email', 'address', 'phone', 'password_hash', 'password_reset_token', 'pasport'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             [['username'], 'unique'],
             [['password_reset_token'], 'unique'],
@@ -89,26 +105,15 @@ class User extends ActiveRecord implements IdentityInterface
             'email' => 'Email',
             'birthday' => 'Дата рождения',
             'role' => 'Роль',
+            'status' => 'Статус',
             'address' => 'Адрес',
             'phone' => 'Телефон',
             'auth_key' => 'Auth Key',
+            'pasport' => 'Паспорт',
             'password_hash' => 'Password Hash',
             'password_reset_token' => 'Password Reset Token',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата регистрации',
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [
-            'timestamp' => [
-                'class' => 'yii\behaviors\TimestampBehavior',
-                'value' => new Expression('NOW()'),
-            ],
         ];
     }
 
@@ -126,6 +131,33 @@ class User extends ActiveRecord implements IdentityInterface
     public static function findIdentityByAccessToken($token, $type = null)
     {
         throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+    }
+
+    /**
+     * Получить массив названий ролей
+     * @return array
+     */
+    public static function getListRole()
+    {
+        return self::$role_list;
+    }
+
+    /**
+     * ПОлучить список стутусов
+     * @return array
+     */
+    public function geSelectStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * Получить название роли
+     * @return string
+     */
+    public function getRoleName()
+    {
+        return self::$role_list[$this->role];
     }
 
     /**
@@ -241,5 +273,23 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    /**
+     * Получить все коды книг
+     * @return array
+     */
+    public static function getArrayLogin()
+    {
+        return self::find()->select('username')->asArray()->column();
+    }
+
+    /**
+     * Получить массив всех отелов
+     * @retuern array id->name
+     */
+    public static function getToSelect()
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'username');
     }
 }

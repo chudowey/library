@@ -3,14 +3,15 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-use backend\assets\AppAsset;
+use frontend\assets\AdminAsset;
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use common\widgets\Alert;
 
-AppAsset::register($this);
+AdminAsset::register($this);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -39,6 +40,7 @@ AppAsset::register($this);
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
+        $menuItems[] = ['label' => 'Рабоичй процесс', 'url' => ['/admin/reader-card/index']];
         $menuItems[] = ['label' => 'Пользователи', 'url' => ['/admin/user/index']];
         $menuItems[] = ['label' => 'Полки', 'url' => ['/admin/racks/index']];
         $menuItems[] = ['label' => 'Отделы', 'url' => ['/admin/departments/index']];

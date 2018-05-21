@@ -23,6 +23,7 @@ class m130524_201442_init extends Migration
             'status' => $this->tinyInteger()->defaultValue(10),
             'address' => $this->string(),
             'phone' => $this->string(),
+            'pasport' => $this->string(),
             'auth_key' => $this->string(32)->notNull(),
             'password_hash' => $this->string()->notNull(),
             'password_reset_token' => $this->string()->unique(),
@@ -46,6 +47,7 @@ class m130524_201442_init extends Migration
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
             'author' => $this->string()->notNull(),
+            'code' => $this->string()->unique()->notNull(),
             'genre' => $this->string(),
             'publishing' => $this->string(),
             'public_date' => $this->string(),
@@ -53,6 +55,7 @@ class m130524_201442_init extends Migration
             'department_id' => $this->integer(),
             'rack_id' => $this->integer(),
             'count' => $this->smallInteger(),
+            'description' => $this->string(),
             'created_at' => $this->timestamp()->notNull(),
             'updated_at' => $this->timestamp()->notNull(),
         ], $tableOptions);
@@ -78,10 +81,10 @@ class m130524_201442_init extends Migration
 
     public function safeDown()
     {
-        $this->dropTable('{{%user}}');
-        $this->dropTable('{{%departments}}');
-        $this->dropTable('{{%racks}}');
-        $this->dropTable('{{%books}}');
         $this->dropTable('{{%reader_card}}');
+        $this->dropTable('{{%books}}');
+        $this->dropTable('{{%racks}}');
+        $this->dropTable('{{%departments}}');
+        $this->dropTable('{{%user}}');
     }
 }
