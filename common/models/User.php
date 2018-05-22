@@ -36,19 +36,17 @@ class User extends ActiveRecord implements IdentityInterface
      */
     const ROLE_READER = 1;
     const ROLE_EMPLOYEE = 2;
-    const ROLE_ADMIN = 10;
 
     private static $role_list = [
         self::ROLE_READER => 'Читатель',
         self::ROLE_EMPLOYEE => 'Библиотекарь',
-        self::ROLE_ADMIN => 'Администратор'
     ];
 
     /**
      * Список статусов
      * @var array
      */
-    private $status = [
+    private static $status = [
         self::STATUS_ACTIVE => 'Активный',
         self::STATUS_BLOCKED => 'Заблокированный',
     ];
@@ -69,6 +67,8 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             'timestamp' => [
                 'class' => 'yii\behaviors\TimestampBehavior',
+                'createdAtAttribute' => 'created_at',
+                'updatedAtAttribute' => 'updated_at',
                 'value' => new Expression('NOW()'),
             ],
         ];
@@ -81,8 +81,8 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
-            /*['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_BLOCKED]],*/
-            [['password_hash', 'username'], 'required'],
+            ['role', 'integer'],
+            /*[['password_hash', 'username'], 'required'],*/
             [['birthday', 'created_at', 'updated_at'], 'safe'],
             [['name', 'username', 'surname', 'lastname', 'email', 'address', 'phone', 'password_hash', 'password_reset_token', 'pasport'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
@@ -112,8 +112,8 @@ class User extends ActiveRecord implements IdentityInterface
             'pasport' => 'Паспорт',
             'password_hash' => 'Password Hash',
             'password_reset_token' => 'Password Reset Token',
-            'created_at' => 'Дата создания',
-            'updated_at' => 'Дата регистрации',
+            'created_at' => 'Дата регистрации',
+            'updated_at' => 'Дата обновления',
         ];
     }
 
@@ -148,7 +148,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function geSelectStatus()
     {
-        return $this->status;
+        return self::$status;
     }
 
     /**
@@ -158,6 +158,15 @@ class User extends ActiveRecord implements IdentityInterface
     public function getRoleName()
     {
         return self::$role_list[$this->role];
+    }
+
+    /**
+     * Получить название статуса
+     * @return string
+     */
+    public function getStatusName()
+    {
+        return self::$status[$this->status];
     }
 
     /**
@@ -291,5 +300,23 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getToSelect()
     {
         return ArrayHelper::map(self::find()->all(), 'id', 'username');
+    }
+
+    /**
+     * Проверить ползователя если он работник
+     * @return boolean [description]
+     */
+    public function isEmployee()
+    {
+        return $this->role == self::ROLE_EMPLOYEE;
+    }
+
+    /**
+     * Количество книг в библиотеке
+     */
+    public static function getCountBockToBiblio($username)
+    {
+        $user = self::find()->where(['username' => $username])->one();
+        return \common\models\ReaderCard::find()->where(['reader_id' => $user->id])->andWhere(['status' => ReaderCard::STATUS_NOT_RETURNED])->count() < 5;
     }
 }

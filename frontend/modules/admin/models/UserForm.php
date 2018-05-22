@@ -42,7 +42,7 @@ class UserForm extends \yii\base\Model
     public function rules()
     {
         return [
-            [['user_password', 'login'], 'string', 'min' => 6],
+            [['user_password'], 'string', 'min' => 6],
             ['login', 'required'],
         ];
     }

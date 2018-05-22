@@ -18,7 +18,7 @@ class ReaderCardSearch extends ReaderCard
     public function rules()
     {
         return [
-            [['id', 'book_id', 'reader_id', 'employee_id'], 'integer'],
+            [['id', 'book_id', 'reader_id', 'employee_id', 'status'], 'integer'],
             [['date_operation', 'date_return', 'created_at', 'updated_at'], 'safe'],
         ];
     }
@@ -39,10 +39,18 @@ class ReaderCardSearch extends ReaderCard
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $status)
     {
         $query = ReaderCard::find();
-
+        if ($status == 'no_return' || $status == 'ower') {
+            $query->andWhere(['status' => \common\models\ReaderCard::STATUS_NOT_RETURNED]);
+            if ($status == 'ower') {
+                $query->andWhere(['<', 'date_return', date('Y-m-d')]);
+            }
+        } elseif ($status == 'return') {
+            $query->andWhere(['status' => \common\models\ReaderCard::STATUS_RETURNED]);
+        }
+            
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -60,6 +68,7 @@ class ReaderCardSearch extends ReaderCard
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'status' => $this->status,
             'book_id' => $this->book_id,
             'reader_id' => $this->reader_id,
             'employee_id' => $this->employee_id,

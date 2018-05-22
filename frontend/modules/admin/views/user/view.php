@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use common\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
@@ -24,7 +25,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
-
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
@@ -35,8 +35,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'lastname',
             'email:email',
             'birthday',
-            'role',
-            'status',
+            [
+                'attribute' => 'role',
+                'value' => $model->getRoleName(),
+            ],
+            [
+                'attribute' => 'status',
+                'value' => $model->getStatusName(),
+            ],
             'address',
             'phone',
             'pasport',

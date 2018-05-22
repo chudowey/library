@@ -7,7 +7,7 @@ use yii\helpers\Html;
 /* @var $model common\models\ReaderCard */
 
 $this->title = 'Создание записи';
-$this->params['breadcrumbs'][] = ['label' => 'Запись', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Выдача книг', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="reader-card-create">
@@ -16,6 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $this->render('_form', [
         'model' => $model,
+        'error' => $error,
     ]) ?>
 
 </div>

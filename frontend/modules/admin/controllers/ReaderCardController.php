@@ -9,6 +9,8 @@ use frontend\modules\admin\models\ReaderCardSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use common\models\Books;
+use common\models\User;
 
 /**
  * ReaderCardController implements the CRUD actions for ReaderCard model.
@@ -34,10 +36,10 @@ class ReaderCardController extends Controller
      * Lists all ReaderCard models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($stat = 'all')
     {
         $searchModel = new ReaderCardSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $stat);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -66,13 +68,24 @@ class ReaderCardController extends Controller
     public function actionCreate()
     {
         $model = new ReaderCardForm();
-
-        if ($model->save(Yii::$app->request->post())) {
-            return $this->redirect(['view', 'id' => $model->ReaderCard->id]);
+        $error = false;
+        if ($post = Yii::$app->request->post()) {
+            if (User::getCountBockToBiblio($post['ReaderCardForm']['reader'])) {
+                if (Books::getCountBockToBiblio($post['ReaderCardForm']['book']) > 0) {
+                    if ($model->save($post = Yii::$app->request->post())) {
+                        return $this->redirect(['view', 'id' => $model->ReaderCard->id]);
+                    }
+                } else {
+                    $error = "Все экземпляры выбранной книги (код:{$post['ReaderCardForm']['book']}) числятся у читателей";
+                }
+            } else {
+                $error = "У читателя {$post['ReaderCardForm']['reader']} на руках больше 5 книг";
+            }
         }
 
         return $this->render('create', [
             'model' => $model,
+            'error' => $error,
         ]);
     }
 
@@ -124,5 +137,25 @@ class ReaderCardController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
+     * Продлить книгу
+     */
+    public function actionProlong($id)
+    {
+        if ($this->findModel($id)->prolongBook()) {
+            return $this->redirect(['view', 'id' => $id]);
+        }
+    }
+
+    /**
+     * Принять книгу
+     */
+    public function actionTake($id)
+    {
+        if ($this->findModel($id)->takeBook()) {
+            return $this->redirect(['view', 'id' => $id]);
+        }
     }
 }

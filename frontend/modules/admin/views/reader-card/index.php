@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel frontend\modules\admin\models\ReaderCardSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Карточка читателя';
+$this->title = 'Выдача книг';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="reader-card-index">
@@ -23,27 +23,52 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'rowOptions'=>function($model){
+            if($model->isOwesBook()){
+                return ['class' => 'danger'];
+            }
+        },
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             //'id',
             [
                 'attribute' => 'book_id',
+                'filter' => \common\models\Books::getToSelect(),
                 'value' => function ($model) {
                     return $model->book->code;
                 },
             ],
-            [
-                'attribute' => 'book.name',
-                'content' => function ($data) {
-                    return count($model->reader->username);
-                }
-                /*'value' => function ($model) {
-                    return $model->reader->username;
-                },*/
-            ],
             'book.name',
-            'date_operation',
-            'date_return',
+            'book.author',
+            [
+                'attribute' => 'reader_id',
+                'filter' => \common\models\User::getToSelect(),
+                'content' => function ($model) {
+                    return $model->reader->username;
+                }
+            ],
+            [
+                'attribute' => 'user.name',
+                'label' => 'Имя читателя',
+                'value' => function ($model) {
+                    return $model->reader->name . ' ' . $model->reader->surname;
+                }
+            ],
+            [
+                'attribute' => 'date_operation',
+                'format' => ['date', 'dd-MM-Y'],
+            ],
+            [
+                'attribute' => 'date_return',
+                'format' => ['date', 'dd-MM-Y'],
+            ],
+            [
+                'attribute' => 'status',
+                'filter' => ['Не возвращена', 'Возвращена'],
+                'value' => function($model) {
+                    return $model->getStatusName();
+                }
+            ],
             //'employee_id',
             //'created_at',
             //'updated_at',

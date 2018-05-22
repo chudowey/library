@@ -79,6 +79,7 @@ class Books extends \yii\db\ActiveRecord
             'count' => 'Кол-во экземпляров',
             'created_at' => 'Дата добавления',
             'updated_at' => 'Дата редактирования',
+            'description' => 'Описание',
         ];
     }
 
@@ -90,6 +91,8 @@ class Books extends \yii\db\ActiveRecord
         return [
             'timestamp' => [
                 'class' => 'yii\behaviors\TimestampBehavior',
+                'createdAtAttribute' => 'created_at',
+                'updatedAtAttribute' => 'updated_at',
                 'value' => new Expression('NOW()'),
             ],
         ];
@@ -136,5 +139,14 @@ class Books extends \yii\db\ActiveRecord
     public static function getToSelect()
     {
         return ArrayHelper::map(self::find()->all(), 'id', 'code');
+    }
+
+    /**
+     * Количество книг в библиотеке
+     */
+    public static function getCountBockToBiblio($code)
+    {
+        $book = self::find()->where(['code' => $code])->one(); 
+        return $book->count - ReaderCard::find()->where(['book_id' => $book->id])->andWhere(['status' => ReaderCard::STATUS_NOT_RETURNED])->count();
     }
 }

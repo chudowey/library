@@ -40,7 +40,12 @@ AdminAsset::register($this);
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
-        $menuItems[] = ['label' => 'Рабоичй процесс', 'url' => ['/admin/reader-card/index']];
+        $menuItems[] = ['label' => 'Выдача книг', 'url' => ['/admin/reader-card/index'], 'items' => [
+            ['label' => 'Все', 'url' => ['/admin/reader-card/index']],
+            ['label' => 'Просроченные', 'url' => ['/admin/reader-card/index', 'stat' => 'ower']],
+            ['label' => 'Не возвращенные', 'url' => ['/admin/reader-card/index', 'stat' => 'no_return']],
+            ['label' => 'Возвращенные', 'url' => ['/admin/reader-card/index', 'stat' => 'return']],
+        ]];
         $menuItems[] = ['label' => 'Пользователи', 'url' => ['/admin/user/index']];
         $menuItems[] = ['label' => 'Полки', 'url' => ['/admin/racks/index']];
         $menuItems[] = ['label' => 'Отделы', 'url' => ['/admin/departments/index']];

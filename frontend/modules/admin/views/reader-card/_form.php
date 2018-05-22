@@ -44,4 +44,9 @@ use kartik\typeahead\TypeaheadBasic;
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
     </div>
     <?php ActiveForm::end(); ?>
-</div>
+</div><?php
+if ($error) {
+    ?><div class="alert alert-danger">
+        <strongВнимание!></strong><?= $error ?>
+    </div><?php
+}
